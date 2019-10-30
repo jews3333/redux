@@ -1,41 +1,44 @@
-import { INCREMENT, DECREMENT, SET_DIFF } from '../actions';
-import { combineReducers } from 'redux';
+import { Map, List } from 'immutable';
+import * as types from '../actions/ActionTypes';
 
-const counterInitialState = {
-    value: 0,
-    diff: 1
-};
+const initialState = Map({
+    counters: List([
+        Map({
+            color: 'black',
+            number: 0
+        })
+    ])
+})
 
-const counter = (state = counterInitialState, action) => {
-    switch(action.type) {
-        case INCREMENT:
-            return Object.assign({}, state, {
-                value: state.value + state.diff
-            });
-        case DECREMENT:
-            return Object.assign({}, state, {
-                value: state.value - state.diff
-            });
-        case SET_DIFF:
-            return Object.assign({}, state, {
-                diff: action.diff
-            });
-        default:
-            return state;
-    }
-};
+function counter(state = initialState, action) {
+    const counters = state.get('counters');
 
-
-const extra = (state = { value: 'this_is_extra_reducer' }, action) => {
-    switch(action.type) {
+    switch(action.type){
+        case types.CREATE:
+            return state.set('counters', counters.push(Map({
+                color: action.color,
+                number: 0
+            })))
+        case types.REMOVE:
+            return state.set('counters', counters.pop());
+        case types.INCREMENT:
+            return state.set('counters', counters.update(
+                action.index,
+                (counter) => counter.set('number', counter.get('number') + 1)
+            ))
+        case types.DECREMENT:
+            return state.set('counters', counters.update(
+                action.index,
+                (counter) => counter.set('number', counter.get('number') - 1)
+            ))
+        case types.SET_COLOR:
+            return state.set('counters', counters.update(
+                action.index,
+                (counter) => counter.set('color', action.color)
+            ))
         default:
             return state;
     }
 }
 
-const counterApp = combineReducers({
-    counter,
-    extra
-});
-
-export default counterApp;
+export default counter;

@@ -1,20 +1,30 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
-class Counter extends React.Component {
-    render() {
-        return (
-            <h1>VALUE: { this.props.value }</h1>
-        );
-    }
-}
+const Counter = ({number, color, index, onIncrement, onDecrement, onSetColor}) => {
+    return (
+        <div 
+            className="Counter" 
+            onClick={() => onIncrement(index)} 
+            onContextMenu={
+                (e) => { 
+                    e.preventDefault(); 
+                    onDecrement(index);
+                }
+            } 
+            onDoubleClick={() => onSetColor(index)}
+            style={{backgroundColor: color}}>
+                {number}
+        </div>
+    );
+};
 
-let mapStateToProps = (state) => {
-    return {
-        value: state.counter.value
-    };
-}
-
-Counter = connect(mapStateToProps)(Counter);
+Counter.defaultProps = {
+    index: 0,
+    number: 0,
+    color: 'black',
+    onIncrement: () => console.warn('onIncrement not defined'),
+    onDecrement: () => console.warn('onDecrement not defined'),
+    onSetColor: () => console.warn('onSetColor not defined')
+};
 
 export default Counter;
